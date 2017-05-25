@@ -1,3 +1,4 @@
+source('helpers.R')
 
 # Classify the dataset with decision tree.
 decisionTreeClassifier <- function(trainingData, testData) {
@@ -11,12 +12,7 @@ decisionTreeClassifier <- function(trainingData, testData) {
   prediction <- predict(fit, newdata = testData)
   print("Predicted the results.")
   
-  # Write to output file.
-  id <- rownames(prediction)
-  prediction <- cbind(id = id, prediction)
-  prediction <- data.table(prediction)
-  fwrite(prediction, file = outputFileName)
-  print(paste("Submission output written to", outputFileName))
+  constructOutputFile(prediction, outputFileName)
 }
 
 # Classify the dataset using random forests.
@@ -82,13 +78,4 @@ randomForestClassifier <- function(trainingData, testData) {
   # Predict the class values.
   prediction <- predict(fit, newdata = testData, type = "prob")
   constructOutputFile(prediction, outputFileName)
-}
-
-constructOutputFile <- function(prediction, outputFileName) {
-  # Write to output file.
-  id <- rownames(prediction)
-  prediction <- cbind(id = id, prediction)
-  prediction <- data.table(prediction)
-  fwrite(prediction, file = outputFileName)
-  print(paste("Submission output written to", outputFileName))
 }

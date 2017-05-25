@@ -21,10 +21,4 @@ trainingData$id <- NULL
 testData <- fread('data/test.csv')
 testData$id = NULL
 
-# Write to output file.
-#id <- rownames(prediction)
-#prediction <- cbind(id=id, prediction)
-#prediction <- data.table(prediction)
-#res <- prediction[, print(.SD)]
-
-#fwrite(prediction, file = "data/submission_randomForest.csv")
+decisionTreeClassifier(trainingData, testData)
