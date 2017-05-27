@@ -10,18 +10,25 @@ library(rpart.plot)
 library(RColorBrewer)
 library(randomForest)
 library(class)
+library(e1071)
+
 source('helpers.R')
 source('classifiers.R')
 
 # Collect the training data.
 trainingData <- fread('data/train.csv')
 trainingData$id <- NULL
-targets <- trainingData$target
-trainingData$target <- NULL
 
 # Collect the test data.
 testData <- fread('data/test.csv')
 testData$id = NULL
 
-# result <- knn(train = trainingData, test = testData, cl=targets, k = 3)
-# randomForestClassifier(trainingData, testData)
+# result <- randomForestClassifier(trainingData, testData)
+
+# result <- decisionTreeClassifier(trainingData = trainingData, testData = testData)
+
+fit <- naiveBayes(target ~ ., data = trainingData)
+prediction <- predict(fit, newdata = testData, type = "raw")
+pdt <- data.table(prediction)
+names <- colnames(pdt)
+pdt$predictedClass = pdt[,names[apply(.SD,1,which.max)]]

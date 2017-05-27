@@ -19,19 +19,7 @@ decisionTreeClassifier <- function(trainingData, testData) {
 randomForestClassifier <- function(trainingData, testData) {
   outputFileName <- 'data/submission_randomForest.csv'
   
-  # 75% of the training dataset.
-  sampleSize <- floor(0.75 * nrow(trainingData))
-  
-  # set the seed to make your partition reproductible
-  set.seed(123)
-  trainIndex <-
-    sample(seq_len(nrow(trainingData)), size = sampleSize)
-  
-  # Construct the train and test datasets.
-  train <- trainingData[trainIndex,]
-  test <- trainingData[-trainIndex,]
-  testClasses <- test$target
-  test$target = NULL
+  list[train, test, testClasses] <- getTrainingTestDatasets(trainingData)
   
   minError <- .Machine$double.xmax
   bestTreeCount <- 10
@@ -79,5 +67,15 @@ randomForestClassifier <- function(trainingData, testData) {
   
   # Predict the class values.
   prediction <- predict(fit, newdata = testData, type = "prob")
+  constructOutputFile(prediction, outputFileName)
+}
+
+naiveBayesClassifier <- function(trainingData, testData) {
+  fit <- naiveBayes(target ~ ., data = trainingData)
+  print("Trained the model.")
+  
+  prediction <- predict(fit, newdata = testData, type = "raw")
+  print("Predicted the results.")
+  
   constructOutputFile(prediction, outputFileName)
 }
