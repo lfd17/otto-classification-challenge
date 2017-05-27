@@ -28,15 +28,15 @@ randomForestClassifier <- function(trainingData, testData) {
     sample(seq_len(nrow(trainingData)), size = sampleSize)
   
   # Construct the train and test datasets.
-  train <- trainingData[trainIndex, ]
-  test <- trainingData[-trainIndex, ]
+  train <- trainingData[trainIndex,]
+  test <- trainingData[-trainIndex,]
   testClasses <- test$target
   test$target = NULL
   
   minError <- .Machine$double.xmax
   bestTreeCount <- 10
   
-  numberOfTrees <- c(10, 25, 50, 100)
+  numberOfTrees <- c(10, 25, 50, 100, 250)
   for (treeCount in numberOfTrees) {
     # Fit the model with given tree count.
     fit <-
@@ -49,23 +49,25 @@ randomForestClassifier <- function(trainingData, testData) {
     
     # Predict the class values.
     prediction <- predict(fit, newdata = test)
-    
+
     # Calculate the error.
     test$originalClass <- testClasses
     test$predictedClass <- prediction
     test$result <- test[, result <- originalClass == predictedClass]
     errorRate <- table(test$result)["FALSE"] / length(test$result)
-    
-    sprintf("Error rate with %d trees is %f.", treeCount, errorRate)
-    
+
+    print(sprintf("Error rate with %d trees is %f.", treeCount, errorRate))
+
     if (errorRate < minError) {
       minError <- errorRate
       bestTreeCount <- treeCount
     }
   }
   
-  sprintf("Best fitting values are %d trees with error rate of %f.", bestTreeCount, minError)
-   
+  print(sprintf("Best fitting values are %d trees with error rate of %f.",
+          bestTreeCount,
+          minError))
+  
   # Fit the model with best tree count.
   fit <-
     randomForest(
