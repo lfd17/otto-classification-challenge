@@ -2,24 +2,33 @@ source('helpers.R')
 
 # Classify the dataset with decision tree.
 decisionTreeClassifier <- function(trainingData, testData) {
-  outputFileName <- 'data/submission_decisionTree.csv'
   
-  # Construct the model.
-  fit <- rpart(target ~ ., method = "class", data = trainingData)
-  print("Trained the model.")
+  # Calculate error rate.
+  res <- getTrainingTestDatasets(trainingData)
+  train <- res[[1]]
+  test <- res[[2]]
+  testClasses <- res[[3]]
+  
+  fit <- rpart(target ~ ., method = "class", data = train)
   
   # Predict the test data classes.
-  prediction <- predict(fit, newdata = testData)
-  print("Predicted the results.")
+  prediction <- predict(fit, newdata = test)
+  error <- calculateErrorRate(prediction, testClasses)
+  print(sprintf("Error rate is %f", error))
   
-  constructOutputFile(prediction, outputFileName)
+  fit <- rpart(target ~ ., method = "class", data = trainingData)
+  prediction <- predict(fit, newdata = testData)
+  
+  constructOutputFile(prediction, "data/submission_decisionTree.csv")
 }
 
 # Classify the dataset using random forests.
 randomForestClassifier <- function(trainingData, testData) {
-  outputFileName <- 'data/submission_randomForest.csv'
-  
-  list[train, test, testClasses] <- getTrainingTestDatasets(trainingData)
+
+  res <- getTrainingTestDatasets(trainingData)
+  train <- res[[1]]
+  test <- res[[2]]
+  testClasses <- res[[3]]
   
   minError <- .Machine$double.xmax
   bestTreeCount <- 10
@@ -35,20 +44,15 @@ randomForestClassifier <- function(trainingData, testData) {
         ntree = treeCount
       )
     
-    # Predict the class values.
-    prediction <- predict(fit, newdata = test)
-
-    # Calculate the error.
-    test$originalClass <- testClasses
-    test$predictedClass <- prediction
-    test$result <- test[, result <- originalClass == predictedClass]
-    errorRate <- table(test$result)["FALSE"] / length(test$result)
-
+    # Predict the class values and calculate the error.
+    prediction <- predict(fit, newdata = test, type = "prob")
+    errorRate <- calculateErrorRate(prediction, testClasses)
     print(sprintf("Error rate with %d trees is %f.", treeCount, errorRate))
 
     if (errorRate < minError) {
       minError <- errorRate
       bestTreeCount <- treeCount
+      bestPrediction <- prediction
     }
   }
   
@@ -56,26 +60,43 @@ randomForestClassifier <- function(trainingData, testData) {
           bestTreeCount,
           minError))
   
-  # Fit the model with best tree count.
+  # Fit the model with given tree count.
   fit <-
     randomForest(
       as.factor(target) ~ .,
       data = trainingData,
       importance = TRUE,
-      ntree = bestTreeCount
+      ntree = treeCount
     )
   
   # Predict the class values.
   prediction <- predict(fit, newdata = testData, type = "prob")
-  constructOutputFile(prediction, outputFileName)
+  
+  # Create the output file.
+  constructOutputFile(prediction, "data/submission_randomForest.csv")
 }
 
 naiveBayesClassifier <- function(trainingData, testData) {
+  
+  res <- getTrainingTestDatasets(trainingData)
+  train <- res[[1]]
+  test <- res[[2]]
+  testClasses <- res[[3]]
+  
+  print("Calculating the error rate of the algorithm.")
+  fit <- naiveBayes(target ~ ., data = train)
+  prediction <- predict(fit, newdata = test, type = "raw")
+  errorRate <- calculateErrorRate(prediction, testClasses)
+  print(sprintf("Error rate is %f.", errorRate))
+  
+  # Calculate the fit on all training data.
   fit <- naiveBayes(target ~ ., data = trainingData)
   print("Trained the model.")
   
+  # Predict the test data classes.
   prediction <- predict(fit, newdata = testData, type = "raw")
   print("Predicted the results.")
   
-  constructOutputFile(prediction, outputFileName)
+  # Construct the output file.
+  constructOutputFile(prediction, "data/submission_naiveBayes.csv")
 }

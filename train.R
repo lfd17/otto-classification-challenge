@@ -23,25 +23,6 @@ trainingData$id <- NULL
 testData <- fread('data/test.csv')
 testData$id = NULL
 
-# result <- randomForestClassifier(trainingData, testData)
-
-# result <- decisionTreeClassifier(trainingData = trainingData, testData = testData)
-
-# Calculate error rate.
-res <- getTrainingTestDatasets(trainingData)
-train <- res[[1]]
-test <- res[[2]]
-testClasses <- res[[3]]
-fit <- rpart(target ~ ., method = "class", data = train)
-
-# Predict the test data classes.
-prediction <- predict(fit, newdata = test)
-error <- calculateErrorRate(prediction, testClasses)
-print(sprintf("Error rate is %f", error))
-
-
-fit <- naiveBayes(target ~ ., data = trainingData)
-prediction <- predict(fit, newdata = testData, type = "raw")
-pdt <- data.table(prediction)
-names <- colnames(pdt)
-pdt$predictedClass = pdt[,names[apply(.SD,1,which.max)]]
+# naiveBayesClassifier(trainingData, testData)
+# randomForestClassifier(trainingData, testData)
+decisionTreeClassifier(trainingData = trainingData, testData = testData)

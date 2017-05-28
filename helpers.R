@@ -11,7 +11,7 @@ constructOutputFile <- function(prediction, outputFileName) {
   id <- rownames(prediction)
   prediction <- cbind(id = id, prediction)
   fwrite(prediction, file = outputFileName)
-  sprintf("Submission output written to %s", outputFileName)
+  print(sprintf("Submission output written to %s", outputFileName))
 }
 
 getTrainingTestDatasets <- function(trainingData) {
