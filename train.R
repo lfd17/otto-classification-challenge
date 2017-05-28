@@ -11,6 +11,7 @@ library(RColorBrewer)
 library(randomForest)
 library(class)
 library(e1071)
+library(nnet)
 
 source('helpers.R')
 source('classifiers.R')
@@ -24,5 +25,7 @@ testData <- fread('data/test.csv')
 testData$id = NULL
 
 # naiveBayesClassifier(trainingData, testData)
+# logisticRegressionClassifier(trainingData, testData)
 # randomForestClassifier(trainingData, testData)
 decisionTreeClassifier(trainingData = trainingData, testData = testData)
+

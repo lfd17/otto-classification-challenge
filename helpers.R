@@ -31,6 +31,7 @@ getTrainingTestDatasets <- function(trainingData) {
   test$target = NULL
   
   output <- list(train, test, testClasses)
+  return(output)
 }
 
 calculateErrorRate <- function(prediction, originalClasses) {

@@ -3,12 +3,13 @@ source('helpers.R')
 # Classify the dataset with decision tree.
 decisionTreeClassifier <- function(trainingData, testData) {
   
-  # Calculate error rate.
+  # Split the training data into train and validation sets.
   res <- getTrainingTestDatasets(trainingData)
   train <- res[[1]]
   test <- res[[2]]
   testClasses <- res[[3]]
   
+  # Train the model.
   fit <- rpart(target ~ ., method = "class", data = train)
   
   # Predict the test data classes.
@@ -16,6 +17,7 @@ decisionTreeClassifier <- function(trainingData, testData) {
   error <- calculateErrorRate(prediction, testClasses)
   print(sprintf("Error rate is %f", error))
   
+  # Train the model with the actual training data and predict on test dataset.
   fit <- rpart(target ~ ., method = "class", data = trainingData)
   prediction <- predict(fit, newdata = testData)
   
@@ -99,4 +101,26 @@ naiveBayesClassifier <- function(trainingData, testData) {
   
   # Construct the output file.
   constructOutputFile(prediction, "data/submission_naiveBayes.csv")
+}
+
+logisticRegressionClassifier <- function(trainingData, testData) {
+  
+  # Calculate error rate.
+  res <- getTrainingTestDatasets(trainingData)
+  train <- res[[1]]
+  test <- res[[2]]
+  testClasses <- res[[3]]
+  
+  fit <- multinom(target ~ ., data = train)
+  
+  # Predict the test data classes.
+  prediction <- predict(fit, newdata = test, type = "probs")
+  errorRate <- calculateErrorRate(prediction, testClasses)
+  print(sprintf("Error rate is %f.", errorRate))
+  
+  # Predict the test data classes.
+  fit <- multinom(target ~ ., data = trainingData)
+  prediction <- predict(fit, newdata = testData, type = "probs")
+  constructOutputFile(prediction, "data/submission_logisticRegression.csv")
+  
 }
