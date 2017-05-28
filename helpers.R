@@ -31,5 +31,19 @@ getTrainingTestDatasets <- function(trainingData) {
   test$target = NULL
   
   output <- list(train, test, testClasses)
+}
+
+calculateErrorRate <- function(prediction, originalClasses) {
   
+  # Get the dominant class from the probability matrix.
+  prediction <- data.table(prediction)
+  names <- colnames(prediction)
+  prediction$predictedClass = prediction[,names[apply(.SD,1,which.max)]]
+  
+  # Calculate the error.
+  prediction$originalClass <- originalClasses
+  prediction$result <- prediction[, result <- originalClass == predictedClass]
+  errorRate <- table(prediction$result)["FALSE"] / length(prediction$result)
+  
+  return(errorRate)
 }
