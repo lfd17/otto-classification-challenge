@@ -10,7 +10,7 @@ decisionTreeClassifier <- function(trainingData, testData) {
   testClasses <- res[[3]]
   
   # Train the model.
-  fit <- rpart(target ~ ., method = "class", data = train[, -1])
+  fit <- rpart(target ~ ., method = "class", data = train)
   
   # Predict the test data classes.
   prediction <- predict(fit, newdata = test)
@@ -35,7 +35,7 @@ randomForestClassifier <- function(trainingData, testData) {
   minError <- .Machine$double.xmax
   bestTreeCount <- 10
   
-  numberOfTrees <- c(10, 25, 50, 100, 250)
+  numberOfTrees <- c(10, 25, 50, 100, 250, 300, 400, 500)
   for (treeCount in numberOfTrees) {
     # Fit the model with given tree count.
     fit <-

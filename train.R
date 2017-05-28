@@ -12,6 +12,7 @@ library(randomForest)
 library(class)
 library(e1071)
 library(nnet)
+library(xgboost)
 
 source('helpers.R')
 source('classifiers.R')
@@ -24,10 +25,9 @@ trainingData$id <- NULL
 testData <- fread('data/test.csv')
 testData$id = NULL
 
-
 # naiveBayesClassifier(trainingData, testData)
 # logisticRegressionClassifier(trainingData, testData)
-# decisionTreeClassifier(trainingData = trainingData, testData = testData)
+decisionTreeClassifier(trainingData = trainingData, testData = testData)
 # randomForestClassifier(trainingData, testData)
 # neuralNetworkClassifier(trainingData, testData)
 
