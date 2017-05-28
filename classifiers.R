@@ -10,7 +10,7 @@ decisionTreeClassifier <- function(trainingData, testData) {
   testClasses <- res[[3]]
   
   # Train the model.
-  fit <- rpart(target ~ ., method = "class", data = train)
+  fit <- rpart(target ~ ., method = "class", data = train[, -1])
   
   # Predict the test data classes.
   prediction <- predict(fit, newdata = test)
@@ -18,7 +18,7 @@ decisionTreeClassifier <- function(trainingData, testData) {
   print(sprintf("Error rate is %f", error))
   
   # Train the model with the actual training data and predict on test dataset.
-  fit <- rpart(target ~ ., method = "class", data = trainingData)
+  fit <- rpart(target ~ ., method = "class", data = trainingData[, -1])
   prediction <- predict(fit, newdata = testData)
   
   constructOutputFile(prediction, "data/submission_decisionTree.csv")
@@ -41,7 +41,7 @@ randomForestClassifier <- function(trainingData, testData) {
     fit <-
       randomForest(
         as.factor(target) ~ .,
-        data = train,
+        data = train[, -1],
         importance = TRUE,
         ntree = treeCount
       )
@@ -66,7 +66,7 @@ randomForestClassifier <- function(trainingData, testData) {
   fit <-
     randomForest(
       as.factor(target) ~ .,
-      data = trainingData,
+      data = trainingData[, -1],
       importance = TRUE,
       ntree = treeCount
     )
@@ -86,13 +86,13 @@ naiveBayesClassifier <- function(trainingData, testData) {
   testClasses <- res[[3]]
   
   print("Calculating the error rate of the algorithm.")
-  fit <- naiveBayes(target ~ ., data = train)
+  fit <- naiveBayes(target ~ ., data = train[, -1])
   prediction <- predict(fit, newdata = test, type = "raw")
   errorRate <- calculateErrorRate(prediction, testClasses)
   print(sprintf("Error rate is %f.", errorRate))
   
   # Calculate the fit on all training data.
-  fit <- naiveBayes(target ~ ., data = trainingData)
+  fit <- naiveBayes(target ~ ., data = trainingData[, -1])
   print("Trained the model.")
   
   # Predict the test data classes.
@@ -111,7 +111,7 @@ logisticRegressionClassifier <- function(trainingData, testData) {
   test <- res[[2]]
   testClasses <- res[[3]]
   
-  fit <- multinom(target ~ ., data = train)
+  fit <- multinom(target ~ ., data = train[, -1])
   
   # Predict the test data classes.
   prediction <- predict(fit, newdata = test, type = "probs")
@@ -119,8 +119,30 @@ logisticRegressionClassifier <- function(trainingData, testData) {
   print(sprintf("Error rate is %f.", errorRate))
   
   # Predict the test data classes.
-  fit <- multinom(target ~ ., data = trainingData)
+  fit <- multinom(target ~ ., data = trainingData[, -1])
   prediction <- predict(fit, newdata = testData, type = "probs")
   constructOutputFile(prediction, "data/submission_logisticRegression.csv")
   
+}
+
+neuralNetworkClassifier <- function(trainingData, testData) {
+  
+  # Get training and validation sets.
+  res <- getTrainingTestDatasets(trainingData)
+  train <- res[[1]]
+  test <- res[[2]]
+  testClasses <- res[[3]]
+  
+  # Test the algorithm.
+  fit <- nnet(as.factor(target) ~ ., data=train, size=8, na.action = na.omit, maxit = 1000, decay=5e-4)
+  
+  # Predict the test data classes and calculate the error rate.
+  prediction <- predict(fit, newdata = test, type = "raw")
+  errorRate <- calculateErrorRate(prediction, testClasses)
+  print(sprintf("Error rate is %f.", errorRate))
+  
+  # Construct the test results.
+  fit <- nnet(as.factor(target) ~ ., data=trainingData[, -1], size=8, na.action = na.omit, maxit = 1000, decay=5e-4)
+  prediction <- predict(fit, newdata = testData, type = "raw")
+  constructOutputFile(prediction, "data/submission_neuralNetwork_1000iterations_size8.csv")
 }

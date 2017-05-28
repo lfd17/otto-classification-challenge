@@ -24,8 +24,11 @@ trainingData$id <- NULL
 testData <- fread('data/test.csv')
 testData$id = NULL
 
+
 # naiveBayesClassifier(trainingData, testData)
 # logisticRegressionClassifier(trainingData, testData)
+# decisionTreeClassifier(trainingData = trainingData, testData = testData)
 # randomForestClassifier(trainingData, testData)
-decisionTreeClassifier(trainingData = trainingData, testData = testData)
+# neuralNetworkClassifier(trainingData, testData)
+
 
