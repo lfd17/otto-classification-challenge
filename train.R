@@ -5,14 +5,10 @@ library(data.table)
 library(reshape2)
 library(dplyr)
 library(rpart)
-library(rattle)
-library(rpart.plot)
-library(RColorBrewer)
 library(randomForest)
 library(class)
 library(e1071)
 library(nnet)
-library(xgboost)
 
 source('helpers.R')
 source('classifiers.R')
@@ -30,5 +26,6 @@ testData$id = NULL
 decisionTreeClassifier(trainingData = trainingData, testData = testData)
 # randomForestClassifier(trainingData, testData)
 # neuralNetworkClassifier(trainingData, testData)
+
 
 
