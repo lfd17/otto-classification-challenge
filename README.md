@@ -25,7 +25,7 @@ trainingData$id <- NULL
 
 # Collect the test data.
 testData <- fread('data/test.csv')
-testData$id = NULL
+testData$id <- NULL
 
 # Classify the test data using the Naive-Bayes classifier.
 naiveBayesClassifier(trainingData, testData)
